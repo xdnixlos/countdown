@@ -1,0 +1,275 @@
+/* 1. Grund-Setup und Farbschema */
+:root {
+    --bg-color: #1a1a1a;
+    --primary-turquoise: #40E0D0;
+    --accent-gold: #FFD700;
+    --text-color: #f0f0f0;
+    --glass-bg: rgba(40, 40, 40, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+main {
+    max-width: 1200px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+/* 2. Header mit Glas-Effekt */
+header {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    height: 60px;
+    width: auto;
+}
+
+/* 3. Überschrift in Gold mit Schatten */
+header h2 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+/* 4. Das flexible Grid für die Countdowns */
+.countdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* 5. Die "rauchige Glas Kachel" */
+.countdown-card {
+    background: var(--glass-bg);
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.countdown-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-turquoise);
+}
+
+/* 6. Inhalt der Kachel */
+.countdown-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-content h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.timer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-turquoise);
+}
+
+.timer span small {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #a0a0a0;
+}
+
+/* 7. Styling für die "Hinzufügen-Kachel" */
+.add-countdown-card {
+    background: transparent;
+    border: 2px dashed var(--glass-border);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: var(--glass-border);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    min-height: 250px;
+}
+
+.add-countdown-card:hover {
+    border-color: var(--primary-turquoise);
+    color: var(--primary-turquoise);
+    background: rgba(64, 224, 208, 0.1);
+}
+
+.add-countdown-card .plus-icon {
+    font-size: 4rem;
+    font-weight: 200;
+    line-height: 1;
+}
+
+/* 8. Login-Overlay */
+.login-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(26, 26, 26, 0.5);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 100;
+}
+
+/* 9. Allgemeine Formular-Kachel */
+.form-card {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: 15px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    padding: 2.5rem; width: 100%; max-width: 400px;
+    display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+}
+
+.form-card h2 { margin: 0; font-weight: 500; }
+.form-card p { font-size: 0.9rem; color: #a0a0a0; text-align: center; margin: 0;}
+.form-card .logo { height: 50px; }
+
+/* 10. Formular-Styling */
+.form-card form{width:100%;display:flex;flex-direction:column;gap:1.5rem}.input-group{display:flex;flex-direction:column;gap:.5rem}.input-group label{font-size:.9rem;color:#a0a0a0}.input-group input{background:rgba(0,0,0,.2);border:1px solid var(--glass-border);border-radius:8px;padding:.8rem 1rem;color:var(--text-color);font-size:1rem;transition:border-color .2s}.input-group input:focus{outline:0;border-color:var(--primary-turquoise)}.login-button{background-color:var(--primary-turquoise);color:#1a1a1a;border:none;border-radius:8px;padding:.9rem;font-size:1.1rem;font-weight:700;cursor:pointer;transition:background-color .2s,transform .2s}.login-button:hover{background-color:#59f7e6;transform:translateY(-2px)}
+
+/* 11. Links in der Login-Maske */
+.form-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.form-links a {
+    color: #a0a0a0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.form-links a:hover {
+    color: var(--primary-turquoise);
+}
+
+/* 12. Hilfsklasse zum Ausblenden */
+.hidden {
+    display: none !important;
+}
+
+/* 13. Fußzeile */
+footer {
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: auto;
+    border-top: 1px solid var(--glass-border);
+    color: #a0a0a0;
+    font-size: 0.9rem;
+}
+
+/* 14. Toast-Benachrichtigung */
+#toast-notification {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary-turquoise);
+    color: var(--bg-color);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 200;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    transition: top 0.5s ease-in-out;
+}
+
+#toast-notification.show {
+    top: 2rem;
+}
+
+/* 15. Modal-Overlay (für Countdown erstellen) */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(26, 26, 26, 0.5);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 150;
+}
+
+/* 16. Logout-Button im Header */
+.logout-button {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: 1px solid var(--glass-border);
+    color: var(--glass-border);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.logout-button:hover {
+    background-color: var(--primary-turquoise);
+    color: var(--bg-color);
+    border-color: var(--primary-turquoise);
+}
+
+/* 17. Löschen-Button auf der Countdown-Kachel */
+.delete-countdown {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0; /* Standardmäßig unsichtbar */
+    transition: opacity 0.2s ease-in-out;
+}
+
+.countdown-card:hover .delete-countdown {
+    opacity: 1; /* Sichtbar beim Hovern */
+}

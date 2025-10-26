@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-Group Countdowns</title>
+
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a1a1a"/>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast-notification"></div>
+
+    <div class="login-overlay">
+        <div class="form-card" id="login-card">
+            <img src="/favicon.png" alt="WF-Group Logo" class="logo">
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="email">E-Mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-button">Login</button>
+            </form>
+            <div class="form-links">
+                <a href="#" id="show-forgot-password">Passwort vergessen?</a>
+                <a href="#" id="show-register">Noch kein Konto? Registrieren</a>
+            </div>
+        </div>
+
+        <div class="form-card hidden" id="register-card">
+            <img src="/favicon.png" alt="WF-Group Logo" class="logo">
+            <h2>Konto erstellen</h2>
+            <form id="register-form">
+                <div class="input-group">
+                    <label for="register-email">E-Mail</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="input-group">
+                    <label for="register-password">Passwort</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="input-group">
+                    <label for="register-password-confirm">Passwort bestätigen</label>
+                    <input type="password" id="register-password-confirm" required>
+                </div>
+                <button type="submit" class="login-button">Registrieren</button>
+            </form>
+            <div class="form-links">
+                <a href="#" id="show-login-from-register">Bereits ein Konto? Login</a>
+            </div>
+        </div>
+        
+        <div class="form-card hidden" id="forgot-password-card">
+             <img src="/favicon.png" alt="WF-Group Logo" class="logo">
+            <h2>Passwort zurücksetzen</h2>
+            <form>
+                <p>Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.</p>
+                <div class="input-group">
+                    <label for="forgot-email">E-Mail</label>
+                    <input type="email" id="forgot-email" required>
+                </div>
+                <button type="submit" class="login-button">Link anfordern</button>
+            </form>
+             <div class="form-links">
+                <a href="#" id="show-login-from-forgot">Zurück zum Login</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="add-countdown-modal">
+        <div class="form-card">
+            <h2>Neuen Countdown erstellen</h2>
+            <form id="add-countdown-form">
+                <div class="input-group">
+                    <label for="countdown-title">Titel</label>
+                    <input type="text" id="countdown-title" required>
+                </div>
+                <div class="input-group">
+                    <label for="countdown-date">Datum</label>
+                    <input type="date" id="countdown-date" required>
+                </div>
+                 <div class="input-group">
+                    <label for="countdown-time">Uhrzeit</label>
+                    <input type="time" id="countdown-time" required>
+                </div>
+                <div class="input-group">
+                    <label for="countdown-image">Bild-URL (optional)</label>
+                    <input type="url" id="countdown-image">
+                </div>
+                <button type="submit" class="login-button">Erstellen</button>
+            </form>
+            <div class="form-links">
+                 <a href="#" id="close-modal">Abbrechen</a>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <header>
+            <img src="/favicon.png" alt="WF-Group Logo" class="logo">
+            <h2>Meine Countdowns</h2>
+        </header>
+
+        <button class="logout-button hidden" id="logout-btn">Logout</button>
+
+        <div class="countdown-grid">
+             </div>
+    </main>
+
+    <footer>
+        <p>Development WF-Group / Implementation WF-TECH by WF-Group / Founder & Visionary</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const loginOverlay = document.querySelector('.login-overlay');
+            const countdownGrid = document.querySelector('.countdown-grid');
+            const addModal = document.getElementById('add-countdown-modal');
+            const logoutBtn = document.getElementById('logout-btn');
+            let timerInterval;
+
+            // ===================================================================
+            // COUNTDOWN-LOGIK
+            // ===================================================================
+
+            async function fetchCountdowns() {
+                try {
+                    const response = await fetch('/api/countdowns/');
+                    if (!response.ok) {
+                        loginOverlay.style.display = 'flex';
+                        logoutBtn.classList.add('hidden');
+                        return;
+                    }
+                    const countdowns = await response.json();
+                    renderCountdowns(countdowns || []);
+                } catch (error) {
+                    console.error("Fehler beim Abrufen der Countdowns:", error);
+                }
+            }
+
+            function renderCountdowns(countdowns) {
+                countdownGrid.innerHTML = `
+                    <div class="add-countdown-card">
+                        <div class="plus-icon">+</div>
+                        <span>Neuen Countdown erstellen</span>
+                    </div>
+                `;
+                
+                countdownGrid.querySelector('.add-countdown-card').addEventListener('click', () => {
+                    addModal.classList.remove('hidden');
+                });
+                
+                countdowns.forEach(cd => {
+                    const card = document.createElement('div');
+                    card.className = 'countdown-card';
+                    const imageUrl = cd.image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809';
+                    
+                    card.innerHTML = `
+                        <button class="delete-countdown" data-id="${cd.id}">×</button>
+                        <img src="${imageUrl}" alt="Event Bild">
+                        <div class="card-content">
+                            <h3>${cd.title}</h3>
+                            <div class="timer" data-target-time="${cd.target_time}"></div>
+                        </div>`;
+                    countdownGrid.appendChild(card);
+                });
+                startAllTimers();
+            }
+
+            function startAllTimers() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    document.querySelectorAll('.timer').forEach(timerEl => {
+                        const target = new Date(timerEl.dataset.targetTime);
+                        const now = new Date();
+                        const diff = target - now;
+                        
+                        if (diff <= 0) {
+                             timerEl.innerHTML = `<span>🎉</span><span>EVENT</span><span>HAT</span><span>BEGONNEN</span>`;
+                             return;
+                        }
+
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                        timerEl.innerHTML = `
+                            <span>${days} <small>Tage</small></span>
+                            <span>${hours} <small>Std</small></span>
+                            <span>${minutes} <small>Min</small></span>
+                            <span>${seconds} <small>Sek</small></span>
+                        `;
+                    });
+                }, 1000);
+            }
+            
+            countdownGrid.addEventListener('click', async function(event) {
+                if (event.target.classList.contains('delete-countdown')) {
+                    const id = event.target.dataset.id;
+                    if (confirm('Diesen Countdown wirklich löschen?')) {
+                        try {
+                            const response = await fetch(`/api/countdowns/${id}`, { method: 'DELETE' });
+                            if (response.ok) {
+                                showToast('Countdown gelöscht!');
+                                fetchCountdowns();
+                            } else {
+                                alert('Fehler beim Löschen.');
+                            }
+                        } catch (error) {
+                            alert('Netzwerkfehler beim Löschen.');
+                        }
+                    }
+                }
+            });
+
+            const addCountdownForm = document.getElementById('add-countdown-form');
+            addCountdownForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const title = document.getElementById('countdown-title').value;
+                const date = document.getElementById('countdown-date').value;
+                const time = document.getElementById('countdown-time').value;
+                const imageUrl = document.getElementById('countdown-image').value;
+                const targetTime = new Date(`${date}T${time}`).toISOString();
+
+                try {
+                    const response = await fetch('/api/countdowns/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title: title, target_time: targetTime, image_url: imageUrl })
+                    });
+                    if (response.ok) {
+                        showToast("Countdown erfolgreich erstellt!");
+                        addModal.classList.add('hidden');
+                        addCountdownForm.reset();
+                        fetchCountdowns();
+                    } else {
+                        alert("Fehler beim Erstellen des Countdowns.");
+                    }
+                } catch (error) {
+                     alert("Ein Netzwerkfehler ist aufgetreten.");
+                }
+            });
+
+            document.getElementById('close-modal').addEventListener('click', (e) => {
+                e.preventDefault();
+                addModal.classList.add('hidden');
+            });
+
+            // ===================================================================
+            // AUTHENTIFIZIERUNGS- & PWA-LOGIK
+            // ===================================================================
+
+            async function checkAuthenticationStatus() {
+                try {
+                    const response = await fetch('/api/check-auth');
+                    if (response.ok) {
+                        loginOverlay.style.display = 'none';
+                        logoutBtn.classList.remove('hidden');
+                        fetchCountdowns();
+                    } else {
+                        showForm('login-card');
+                        logoutBtn.classList.add('hidden');
+                    }
+                } catch (error) {
+                    showForm('login-card');
+                    logoutBtn.classList.add('hidden');
+                }
+            }
+            
+            function showToast(message, duration = 3000) {
+                const toast = document.getElementById('toast-notification');
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            function showForm(formIdToShow) {
+                document.querySelectorAll('.form-card').forEach(form => form.classList.add('hidden'));
+                const formToShow = document.getElementById(formIdToShow);
+                if (formToShow) formToShow.classList.remove('hidden');
+            }
+            
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showToast('Login erfolgreich! Willkommen zurück.');
+                        setTimeout(() => {
+                            checkAuthenticationStatus();
+                        }, 500);
+                    } else {
+                        alert('Fehler: ' + (result.error || "Unbekannter Fehler"));
+                    }
+                } catch (error) {
+                    alert('Ein Netzwerkfehler ist aufgetreten.');
+                }
+            });
+            
+            const registerForm = document.getElementById('register-form');
+            registerForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                try {
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showToast('Erfolgreich registriert! Du kannst dich jetzt einloggen.');
+                        showForm('login-card');
+                    } else {
+                        alert('Fehler: ' + (result.error || "Unbekannter Fehler"));
+                    }
+                } catch (error) {
+                    alert('Ein Netzwerkfehler ist aufgetreten.');
+                }
+            });
+
+            logoutBtn.addEventListener('click', async () => {
+                await fetch('/api/logout');
+                window.location.reload();
+            });
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service worker registered', reg))
+                    .catch(err => console.log('Service worker not registered', err));
+            }
+
+            document.getElementById('show-register').addEventListener('click', e => { e.preventDefault(); showForm('register-card'); });
+            document.getElementById('show-forgot-password').addEventListener('click', e => { e.preventDefault(); showForm('forgot-password-card'); });
+            document.getElementById('show-login-from-register').addEventListener('click', e => { e.preventDefault(); showForm('login-card'); });
+            document.getElementById('show-login-from-forgot').addEventListener('click', e => { e.preventDefault(); showForm('login-card'); });
+
+            await checkAuthenticationStatus();
+        });
+    </script>
+</body>
+</html>
